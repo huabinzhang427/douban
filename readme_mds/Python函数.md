@@ -278,6 +278,3 @@ for chunk in chunker(range(25), 4):
 [20, 21, 22, 23]
 [24]
 ```
-
-
-  

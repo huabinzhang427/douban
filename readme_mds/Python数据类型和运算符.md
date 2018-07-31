@@ -33,6 +33,7 @@ python 中的方法和函数相似，但是它针对的是你**已经创建的�
 
 ### 字符串方法
 
+![image](https://github.com/huabinzhang427/douban/blob/master/readme_imgs/20180705190244946.png)
 
 任何专业人士都无法记住所有方法，因此知道如何通过文档查询答案非常重要。掌握扎实的编程基础使你能够利用这些基础知识查询文档，并且构建的程序比死记硬背所有 python 可用函数的人士构建的程序强大得多。
 
@@ -148,6 +149,8 @@ IndexError: pop index out of range
 列表是不可随意乱删的。列表的索引在删除之前是固定的，`range()` 则按照从小到大排列。当删除一个索引所对应的值后， python 会自动把删除的位置补上来，这样就会导致从删除位置开始的索引与原索引相差1，从而出现上面的问题。
 
 如果使用 `reversed(range())` ，这种索引是从大到小的顺序排列的。
+
+![image](https://github.com/huabinzhang427/douban/blob/master/readme_imgs/20180716155349358.png)
 
 ## 实用列表函数
 

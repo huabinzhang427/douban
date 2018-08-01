@@ -16,7 +16,7 @@
 
 在终端窗口输入指令 `python --version`，并按回车:
 
-系统可能会显示已安装的 Python 版本是 `Python 2.7.9`。在这种情况下，表明你已经安装了 `Python 2`。如果`版本号以 3 开头`，则表明你已经安装了 `Python 3，**请勿再次安装 Python`！**
+系统可能会显示已安装的 Python 版本是 `Python 2.7.9`。在这种情况下，表明你已经安装了 `Python 2`。如果`版本号以 3 开头`，则表明你已经安装了 `Python 3，请勿再次安装 Python！`
 
 ### 下载/安装 Anaconda
 
@@ -35,3 +35,401 @@
  如果你使用的是 Windows 设备，并且已经安装了 Python，但是未选中上述选项，则需要将 Python 添加到 PATH。这样的话，当你输入 python 时，可以告诉命令行运行 Python 3。如果你未选中上述选项，或者转到下一阶段时似乎不可行，请按照 Python 文档中的这些说明将 Python 添加到 PATH。
  
  ## 运行 Python 脚本
+ 
+ 将 Python3 下载并配置好后，在终端窗口检查是否配置成功
+ 
+ ```
+...$ python --version
+Python 3.6.6 :: Anaconda custom (64-bit)
+```
+在终端窗口使用 cd 命令转到包含 `.py` 的 python 文件目录，运行该文件，查看结果
+
+```
+...$ cd ..
+...$ cd /udacity/python
+...$ ls
+first_script.py	untitled.py
+...$ python first_script.py
+Congratulations on running this script!!
+```
+
+## 配置 Python 编程环境
+
+推荐的`文本编辑器`：
+
+ - [Sublime Text](http://www.sublimetext.com/)
+ 
+ 下载并安装好后，需要将我们新下载的 Python3 与 Sublime 编辑器关联。可以参考文章 [Mac下Sublime Text3配置Python3开发环境](https://blog.csdn.net/qq_33304418/article/details/63337602)
+ 
+ ## 内置函数 input()
+ 
+ 我们可以使用内置函数 input `获取用户的原始输入`，该函数接受一个可选字符串参数，用于指定在要求用户输入时向用户显示的消息。
+ 
+ ```python
+name = input("Enter your name: ")
+print("Hello there, {}!".format(name.title()))
+```
+
+input 函数获取用户输入的任何内容并将其`存储为字符串`。如果你想将输入解析为字符串之外的其他类型，例如整数（如以下示例所示），需要用`新的类型封装结果`并从字符串转换为该类型。
+
+```python
+num = int(input("Enter an integer"))
+print("hello" * num)
+```
+
+我们还可以使用内置函数 `eval` 将用户输入`解析为 Python 表达式`。该函数会`将字符串评估为一行 Python 代码`。
+
+```python
+result = eval(input("Enter an expression: "))
+print(result)
+# 输出
+...$ python untitled.py
+Enter an expression: 3*2 
+6
+```
+
+示例
+
+ 1. 请求用户输入三次。一次是名字列表，一次是未交作业数量列表，一次是分数列表。使用该输入创建 `names`、`assignments` 和 `grades` 列表。
+ 2. 使用循环为每个学生输出一条信息并包含正确的值。潜在分数是 2 乘以未交作业数加上当前分数。
+
+```python
+names = (input("Enter names separated by commas: ")).split(",")
+assignments = ((input("Enter assignment counts separated by commas: "))).split(",")
+grades = ((input("Enter grades separated by commas: "))).split(",")
+
+result = """
+Hi {},\n\nThis is a reminder that you have {} assignments left to \
+submit before you can graduate. Your current grade is {} and can increase \
+to {} if you submit all assignments before the due date.\n\n 
+"""
+
+for name, assignment, grade in zip(names, assignments, grades):
+	print(result.format(name, assignment, grade, 2*int(assignment)+int(grade) ))
+# 命令窗口输入输出
+...$ python untitled.py
+Enter names separated by commas: Chandler bing,Phoebe Buffay,Monica Geller,Ross Geller
+Enter assignment counts separated by commas: 3,6,0,2
+Enter grades separated by commas: 81,77,92,88
+
+Hi Chandler bing,
+
+This is a reminder that you have 3 assignments left to submit before you can graduate. Your current grade is 81 and can increase to 87 if you submit all assignments before the due date.
+
+Hi Phoebe Buffay,
+
+This is a reminder that you have 6 assignments left to submit before you can graduate. Your current grade is 77 and can increase to 89 if you submit all assignments before the due date.
+
+Hi Monica Geller,
+
+This is a reminder that you have 0 assignments left to submit before you can graduate. Your current grade is 92 and can increase to 92 if you submit all assignments before the due date.
+
+Hi Ross Geller,
+
+This is a reminder that you have 2 assignments left to submit before you can graduate. Your current grade is 88 and can increase to 92 if you submit all assignments before the due date.	
+```
+
+## 错误与异常
+
+ - `错误`，当 Python `无法解析代码`时，就会发生`语法错误`，因为我们没有遵守正确的 Python 语法。当你出现拼写错误或第一次开始学习 Python 时，可能会遇到这些错误。
+ - `异常`，当`在程序执行期间`出现意外情况时，就会发生异常，即使代码在语法上正确无误。Python 有不同类型的`内置异常`，你可以在错误消息中查看系统抛出了什么异常。
+
+如果你没有使用正确的语法，并且 Python 不知道如何运行你的代码，会发生语法错误。
+
+如果 Python 在执行代码时遇到意外情形，会发生异常，即使你采用了正确的语法，也可能会发生异常。
+
+### 处理异常
+
+#### Try 语句
+
+我们可以使用 `try 语句` 来处理异常。
+
+ - `try`：这是 try 语句中的唯一必需子句。该块中的代码是 Python 在 try 语句中`首先运行的代码`。
+ - `except`：如果 Python 在运行 try 块时遇到异常，它将跳到`处理该异常的 except 块`。
+ - `else`：如果 Python `在运行 try 块时没有遇到异常`，它将在运行 `try 块后运行`该块中的代码。
+ - `finally`：在 Python `离开此 try 语句之前`，在`任何情形下它都将运行`此 finally 块中的代码，即使要结束程序，例如：如果 Python 在运行 except 或 else 块中的代码时遇到错误，在停止程序之前，依然会执行此finally 块。
+ 
+ [为何在 Python 中需要 `finally` 子句？](https://stackoverflow.com/questions/11551996/why-do-we-need-the-finally-clause-in-python)
+
+您可以使用它 finally 来`确保文件或资源是否已关闭或释放`，无论是否发生异常，即使您没有捕获到异常。
+
+#### 指定异常
+
+我们可以指定要在 except 块中`处理哪个错误`，如下所示：
+
+```python
+try:
+    # some code
+except ValueError:
+    # some code
+```
+
+现在它会捕获 `ValueError` 异常，但是不会捕获其他异常。如果我们希望该处理程序处理多种异常，我们可以在 except 后面添加异常元组。
+
+```python
+try:
+    # some code
+except (ValueError, KeyboardInterrupt):
+    # some code
+```
+
+或者，如果我们希望根据异常执行不同的代码块，可以添加多个 except 块。
+
+```python
+try:
+    # some code
+except ValueError:
+    # some code
+except KeyboardInterrupt:
+    # some code
+```
+
+#### 访问异常信息
+
+```python
+try:
+    # some code
+except ZeroDivisionError as e:
+   # some code
+   print("ZeroDivisionError occurred: {}".format(e))
+   # 输出
+   ZeroDivisionError occurred: division by zero
+```
+因此依然可以访问错误消息，即使已经处理异常以防止程序崩溃！
+
+Exception 是所有内置异常的基础类。你可以在[此处](https://docs.python.org/3/library/exceptions.html#bltin-exceptions)详细了解 Python 的异常。
+
+## 读写文件
+
+### 读取文件
+
+```python
+f = open('my_path/my_file.txt', 'r')
+file_data = f.read()
+f.close()
+```
+ 1. 首先使用`内置函数 open `打开文件。需要`文件路径字符串`。open 函数会`返回文件对象`，它是一个 Python 对象，Python 通过该对象与文件本身交互。在此示例中，我们将此对象赋值给变量 f。
+ 2. 你可以在 open 函数中`指定可选参数`。参数之一是`打开文件时采用的模式`。在此示例中，我们使用 `r`，即`只读模式`。这实际上是模式参数的`默认值`。
+ 3. 使用 `read` 访问文件对象的内容。该 read 方法会`接受文件中包含的文本并放入字符串中`。在此示例中，我们将该方法返回的字符串赋值给变量 file_data。
+ 4. 当我们处理完文件后，使用 `close` 方法`释放该文件占用的系统资源`。 
+
+代码中 `f.read()` 调用没有传入参数。它自动变成从当前位置读取`文件的所有剩余内容`，即`整个文件`。如果向 .read() `传入整型参数`，它将`读取长度是这么多字符的内容`，输出所有内容，并使 'window' `保持在该位置以准备继续读取`。
+
+```python
+with open(camelot.txt) as song:
+    print(song.read(2))
+    print(song.read(8))
+    print(song.read())
+# 输出
+"""
+We
+'re the 
+knights of the round table
+We dance whenever we're able    """
+```
+
+文本块中的 `\n` 是换行符。换行符表示一行的结束，`告诉程序（例如文本编辑器）转到下一行`。但是，对于文件中的一系列字符来说，\n 只是另一个字符。 幸运的是，Python 知道这些是特殊字符，你可以要求 Python 每次读取一行。
+
+`f.readline()`，读取文件下一行的方法。
+
+很方便的是，Python 将使用语法 `for line in file` 循环访问文件中的各行内容。 我可以使用该语法创建列表中的行列表。因为每行依然包含换行符，因此我使用 `.strip()` 删掉换行符。
+
+```python
+camelot_lines = []
+with open("camelot.txt") as f:
+    for line in f:
+        camelot_lines.append(line.strip())
+
+print(camelot_lines)
+# 输出
+"""
+["We're the knights of the round table", "We dance whenever we're able"]"""
+```
+
+### 写入文件
+
+```python
+f = open('my_path/my_file.txt', 'w')
+f.write("Hello there!")
+f.close()
+```
+
+ 1. 以`写入 ('w') 模式`打开文件。如果`文件不存在`，Python 将为你`创建一个文件`。如果以`写入模式打开现有文件`，该文件中之前包含的`所有内容将被删除`。如果你打算向现有文件`添加内容`，但是不删除其中的内容，可以使用附加` ('a') 模式`，而不是写入模式。
+ 2. 使用 `write` 方法向文件中`添加文本`。
+ 3. 操作完毕后，`关闭文件`。
+ 
+ ### With
+ 
+ Python 提供了一个特殊的语法，该语法会在你`使用完文件后自动关闭该文件`。
+ 
+ ```python
+with open('my_path/my_file.txt', 'r') as f:
+    file_data = f.read()
+```
+
+该 `with` 关键字使你能够打开文件，对文件执行操作，并在缩进代码（在此示例中是读取文件）执行之后自动关闭文件。现在，我们不需要调用 f.close() 了！你`只能在此缩进块中访问文件对象 f`。
+
+## 导入本地脚本
+
+我们实际上可以导入其他脚本中的 Python，如果你处理的是大型项目，需要将代码整理成多个文件并重复利用这些文件中的代码，则导入脚本很有用。如果你要导入的 Python 脚本与当前脚本位于同一个目录下，只需输入 `import`，然后是`文件名`，`无需扩展名 .py`。
+
+```python
+import useful_functions
+```
+
+Import 语句写在 Python 脚本的`顶部`，每个导入语句各占一行。该 import 语句会创建一个`模块对象`，叫做 useful_functions。模块是`包含定义和语句的 Python 文件`。要`访问导入模块中的对象`，需要使用`点记法`。
+
+```python
+import useful_functions
+useful_functions.add_five([1, 2, 3, 4])
+```
+
+我们可以为导入模块添加别名，以使用不同的名称引用它。
+
+```python
+import useful_functions as uf
+uf.add_five([1, 2, 3, 4])
+```
+
+### 使用 `if main` 块
+
+为了`避免运行从其他脚本中作为模块导入的脚本中的可执行语句`，将这些行包含在 `if __name__ == "__main__"` 块中。或者，将它们包含在函数 main() 中并在 if main 块中调用该函数。
+
+每当我们运行此类脚本时，Python 实际上会为所有模块设置一个特殊的`内置变量 __name__`。当我们运行脚本时，Python 会将此模块识别为主程序，并将此模块的 __name__ 变量设为`字符串 "__main__"`。对于该脚本中导入的任何模块，这个内置 __name__ 变量会设为该模块的名称。因此，条件 `if __name__ == "__main__"` 会检查该模块是否为主程序。
+
+```python
+# demo.py
+
+import useful_functions as uf
+
+scores = [88, 92, 79, 93, 85]
+
+mean = uf.mean(scores)
+curved = uf.add_five(scores)
+
+mean_c = uf.mean(curved)
+
+print("Scores:", scores)
+print("Original Mean:", mean, " New Mean:", mean_c)
+
+print(__name__)
+print(uf.__name__)
+```
+
+```python
+# useful_functions.py
+
+def mean(num_list):
+    return sum(num_list) / len(num_list)
+
+def add_five(num_list):
+    return [n + 5 for n in num_list]
+
+def main():
+    print("Testing mean function")
+    n_list = [34, 44, 23, 46, 12, 24]
+    correct_mean = 30.5
+    assert(mean(n_list) == correct_mean)
+
+    print("Testing add_five function")
+    correct_list = [39, 49, 28, 51, 17, 29]
+    assert(add_five(n_list) == correct_list)
+
+    print("All tests passed!")
+
+if __name__ == '__main__':
+    main()
+```
+
+## 标准库的模块
+
+上面介绍了我们如何导入自己的模块，但 Python 也内置了完整的标准库模块。标准库里面有大量实用模块，我们可以将这个库看作是一个非常庞大的工具集，帮助我们轻松获取和使用现有代码大大增强我们的编程技能。
+
+[Python 标准库](https://pymotw.com/3/)详细介绍了每种模块，模块按照用途分类。标准库中的每个模块都是全小写形式。在使用每个模块时，建议阅读相关的页面。
+
+### 推荐模块
+
+Python 标准库包含大量模块！为了帮助你熟悉那些实用的模块，我们在下面筛选了一些我们推荐的 Python 标准库模块并解释为何我们喜欢使用它们！
+
+
+ - [`csv`](https://docs.python.org/3/library/csv.html)：对于读取 csv 文件来说非常便利
+ - [`collections`](https://docs.python.org/3/library/collections.html)：常见数据类型的实用扩展，包括 `OrderedDict`、`defaultdict` 和 `namedtuple`
+ - [`random`](https://docs.python.org/3/library/random.html)：生成假随机数字，随机打乱序列并选择随机项
+ - [`string`](https://docs.python.org/3/library/string.html)：关于字符串的更多函数。此模块还包括实用的字母集合，例如 `string.digits`（包含所有字符都是有效数字的字符串）
+ - [`re`](https://docs.python.org/3/library/re.html)：通过正则表达式在字符串中进行模式匹配
+ - [`math`](https://docs.python.org/3/library/math.html)：一些标准数学函数
+ - [`os`](https://docs.python.org/3/library/os.html)：与操作系统交互
+ - [`os.path`](https://docs.python.org/3/library/os.path.html)：`os` 的子模块，用于操纵路径名称
+ - [`sys`](https://docs.python.org/3/library/sys.html)：直接使用 Python 解释器
+ - [`json`](https://docs.python.org/3/library/json.html)：适用于读写 json 文件（面向网络开发）。
+ 
+ ### 导入模块技巧
+ 
+1.要从模块中导入单个函数或类：
+```python
+from module_name import object_name
+```
+2.要从模块中导入多个单个对象：
+```python
+from module_name import first_object, second_object
+```
+3.要重命名模块：
+```python
+import module_name as new_name
+```
+4.要从模块中导入对象并重命名：
+```python
+from module_name import object_name as new_name
+```
+5.要从模块中单个地导入所有对象，请使用标准导入 module_name 语句并使用点记法访问每个对象。
+```python
+import module_name
+```
+为了更好地管理代码，Standard 标准库中的模块被拆分成了子模块并包含在软件包中。软件包是一个包含子模块的模块。子模块使用普通的`点记法`指定。
+
+子模块的指定方式是软件包名称、点，然后是子模块名称。你可以如下所示地导入子模块。
+```python
+import package_name.submodule_name
+```
+
+## 第三方库
+
+独立开发者编写了成千上万的第三方库！你可以使用 `pip` 安装这些库。pip 是在 Python 3 中包含的软件包管理器，它是标准 Python 软件包管理器，但并不是唯一的管理器。另一个热门的管理器是 `Anaconda`，该管理器专门针对数据科学。
+
+要使用 pip 安装软件包，在命令行中输入“pip install”，然后是软件包名称，如下所示：`pip install package_name`。该命令会下载并安装该软件包，以便导入你的程序中。安装完毕后，你可以使用从标准库中导入模块时用到的相同语法导入第三方软件包。
+
+### 使用 `requirements.txt` 文件
+
+大型 Python 程序可能依赖于十几个第三方软件包。为了更轻松地分享这些程序，程序员经常会在叫做 `requirements.txt` 的文件中列出项目的依赖项。下面是一个 requirements.txt 文件示例。
+
+```python
+beautifulsoup4==4.5.1
+bs4==0.0.1
+pytz==2016.7
+requests==2.11.1
+```
+
+该文件的每行包含软件包名称和版本号。版本号是可选项，但是通常都会包含。不同版本的库之间可能变化不大，可能截然不同，因此有必要使用程序作者在写程序时用到的库版本。
+
+你可以使用 pip 一次性安装项目的所有依赖项，方法是在命令行中输入 `pip install -r requirements.txt`。
+
+### 实用的第三方软件包
+
+能够安装并导入第三方库很有用，但是要成为优秀的程序员，还需要知道有哪些库可以使用。大家通常通过在线推荐或同事介绍了解实用的新库。如果你是一名 Python 编程新手，可能没有很多同事，因此为了帮助你了解入门信息，下面是优达学城工程师很喜欢使用的软件包列表。（可能部分网站在国内网络中无法打开）
+
+ - [`IPython`](https://ipython.org/) - 更好的交互式 Python 解释器。
+ - [`requests`](http://docs.python-requests.org/) - 提供易于使用的方法来发出网络请求。适用于访问网络 API。
+ - [`Flask`](http://flask.pocoo.org/) - 一个小型框架，用于构建网络应用和 API。
+ - [`Django`](https://www.djangoproject.com/) - 一个功能更丰富的网络应用构建框架。Django 尤其适合设计复杂、内容丰富的网络应用。
+ - [`Beautiful Soup`](https://www.crummy.com/software/BeautifulSoup/) - 用于解析 HTML 并从中提取信息。适合网页数据抽取。
+ - [`pytest`](http://doc.pytest.org/) - 扩展了 Python 的内置断言，并且是最具单元性的模块。
+ - [`PyYAML`](http://pyyaml.org/wiki/PyYAML) - 用于读写 [YAML](https://en.wikipedia.org/wiki/YAML) 文件。
+ - [`NumPy`](http://www.numpy.org/) - 用于使用 Python 进行科学计算的最基本软件包。它包含一个强大的 N 维数组对象和实用的线性代数功能等。
+ - [`pandas`](http://pandas.pydata.org/) - 包含高性能、数据结构和数据分析工具的库。尤其是，pandas 提供 dataframe！
+ - [`matplotlib`](http://matplotlib.org/) - 二维绘制库，会生成达到发布标准的高品质图片，并且采用各种硬拷贝格式和交互式环境。
+ - [`ggplot`](http://ggplot.yhathq.com/) - 另一种二维绘制库，基于 R's ggplot2 库。
+ - [`Pillow`](https://python-pillow.org/) - Python 图片库可以向你的 Python 解释器添加图片处理功能。
+ - [`pyglet`](http://www.pyglet.org/) - 专门面向游戏开发的跨平台应用框架。
+ - [`Pygame`](http://www.pygame.org/) - 用于编写游戏的一系列 Python 模块。
+ - [`pytz`](http://pytz.sourceforge.net/) - Python 的世界时区定义。
+

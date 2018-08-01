@@ -38,6 +38,8 @@ p 是 "段落" 的缩写。`<p>` 和其结束标签 `</p>` 之间的文本是提
 
 词汇注释：术语 "标签" 和 "元素" 密切相关，`有时可互换使用`。`标签`是一个 HTML `源码`，而`元素`是在浏览器呈现标签后用户可以看到的`可视化组件`。
 
+![image](https://github.com/huabinzhang427/douban/blob/master/readme_imgs/20180716182907140.png)
+
 HTML 文档中的第二个 div 更复杂。它还有一个作为子类的段落标签，该段落标签有自己的子类，img 和 a。这两个子类标签嵌套在 div 标签内，成为 div 的后代标签。但它们不是 div 的子类，而是 `p` 标签的子类。
 
 在 `href` 属性中指定`链接的地址`，开始和结束标签之间的文本即`链接的文本`。
@@ -77,6 +79,10 @@ print(type(response.text))
  ```
 $ pip3 install beautifulsoup4
 ```
+
+![image](https://github.com/huabinzhang427/douban/blob/master/readme_imgs/201807161851474.png)
+
+文档有一个简单方便的快速起步指导，我们可以跟着练习，熟悉使用。
 
 ### 指令查看安装库
 
@@ -186,164 +192,4 @@ def find_first_link(url):
 
 ```python
 url = 'https://en.wikipedia.org/wiki/Cat'
-...
-soup.find(id='mw-content-text').find(class_='mw-parser-output').find(class_='hatnote navigation-not-searchable').a.get('href')
-# >>> '/wiki/Felidae'
-```
-
-`提取页面<a>标记中的url`
-
-```python
-for link in soup.find_all('a'):
-    print(link.get('href'))
-# http://example.com/elsie
-# http://example.com/lacie
-# http://example.com/tillie
-```
-
-`div`元素。请注意，我们必须使用参数 `class_`，原因是 `class 是 Python 中的保留关键字`。
-
-### 改进
-
-我们不能仅仅寻找第一个段落中第一个出现的链接，我们真正要的是第一个段落文本中出现的第一个链接。
-
-```python
-content_div = soup.find(id="mw-content-text").find(class_="mw-parser-output")
-for element in content_div.find_all("p", recursive=False):
-    if element.a:
-        first_relative_link = element.a.get('href')
-        break
-```
-
-第一行代码查找到包含文章正文的 `div`。如果该标签是 div 的子类，则下一行在 div 中循环每个 `<p>`。如果想让 Beautiful Soup 只考虑`直接子类`，可以按照 `recursive=False` 进行传递" 。
-
-循环主体可以查看段落中是否存在 `a` 标签。如果存在，就从链接中获取 url，并将其存储在 `first_relative_link` 中，然后结束循环。
-
-注意：我也可以使用 `children` 方法编写代码。但循环主体将有所不同。
-
-### 再次改进
-
-如何确保我们的代码只能查找到普通文章的链接，而不是链接到脚注、发音指南或其他奇怪的内容？
-
-```python
-content_div = soup.find(id="mw-content-text").find(class_="mw-parser-output")
-for element in content_div.find_all("p", recursive=False):
-    if element.find("a", recursive=False):
-        first_relative_link = element.find("a", recursive=False).get('href')
-        break
-```
-
-这发挥作用的原因是 "特殊链接"（如脚注和发音键）似乎`都包含在更多 div 标签中`。由于这些`特殊链接不是段落标签的直接后代`，可以使用与之前相同的技术`跳过这些链接`。我这次使用 find 方法，而不是 find_all，原因是 `find 可返回其查找到的第一个标签`，而不是匹配标签的列表。
-
-### 总结
-
-`find_first_link()`完整函数内容：
-```python
-def find_first_link(url):
-    response = requests.get(url)
-    html = response.text
-    soup = bs4.BeautifulSoup(html, "html.parser")
-
-    # This div contains the article's body
-    # (June 2017 Note: Body nested in two div tags)
-    content_div = soup.find(id="mw-content-text").find(class_="mw-parser-output")
-
-    # stores the first link found in the article, if the article contains no
-    # links this value will remain None
-    article_link = None
-
-    # Find all the direct children of content_div that are paragraphs
-    for element in content_div.find_all("p", recursive=False):
-        # Find the first anchor tag that's a direct child of a paragraph.
-        # It's important to only look at direct children, because other types
-        # of link, e.g. footnotes and pronunciation, could come before the
-        # first link to an article. Those other link types aren't direct
-        # children though, they're in divs of various classes.
-        if element.find("a", recursive=False):
-            article_link = element.find("a", recursive=False).get('href')
-            break
-
-    if not article_link:
-        return 
-
-    # Build a full url from the relative article_link url
-    first_link = urllib.parse.urljoin('https://en.wikipedia.org/', article_link)
-
-    return first_link
-```
-这里有一行新代码，`first_link = urllib.parse.urljoin ('https://en.wikipedia.org/', article_link)`。 我们之前获取的 `first_relative_link` 是相对 url，我们需要创建绝对 url。
-
-## 运行完整的代码
-
-
-```python
-import time
-import urllib
-
-import bs4
-import requests
-
-
-start_url = "https://en.wikipedia.org/wiki/Special:Random"
-target_url = "https://en.wikipedia.org/wiki/Philosophy"
-
-def find_first_link(url):
-    response = requests.get(url)
-    html = response.text
-    soup = bs4.BeautifulSoup(html, "html.parser")
-
-    # This div contains the article's body
-    # (June 2017 Note: Body nested in two div tags)
-    content_div = soup.find(id="mw-content-text").find(class_="mw-parser-output")
-
-    # stores the first link found in the article, if the article contains no
-    # links this value will remain None
-    article_link = None
-
-    # Find all the direct children of content_div that are paragraphs
-    for element in content_div.find_all("p", recursive=False):
-        # Find the first anchor tag that's a direct child of a paragraph.
-        # It's important to only look at direct children, because other types
-        # of link, e.g. footnotes and pronunciation, could come before the
-        # first link to an article. Those other link types aren't direct
-        # children though, they're in divs of various classes.
-        if element.find("a", recursive=False):
-            article_link = element.find("a", recursive=False).get('href')
-            break
-
-    if not article_link:
-        return
-
-    # Build a full url from the relative article_link url
-    first_link = urllib.parse.urljoin('https://en.wikipedia.org/', article_link)
-
-    return first_link
-
-def continue_crawl(search_history, target_url, max_steps=25):
-    if search_history[-1] == target_url:
-        print("We've found the target article!")
-        return False
-    elif len(search_history) > max_steps:
-        print("The search has gone on suspiciously long, aborting search!")
-        return False
-    elif search_history[-1] in search_history[:-1]:
-        print("We've arrived at an article we've already seen, aborting search!")
-        return False
-    else:
-        return True
-
-article_chain = [start_url]
-
-while continue_crawl(article_chain, target_url):
-    print(article_chain[-1])
-
-    first_link = find_first_link(article_chain[-1])
-    if not first_link:
-        print("We've arrived at an article with no links, aborting search!")
-        break
-
-    article_chain.append(first_link)
-
-    time.sleep(2) # Slow things down so as to not hammer Wikipedia's servers
-```
-
+..
